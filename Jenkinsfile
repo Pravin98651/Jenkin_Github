@@ -1,35 +1,45 @@
 pipeline {
     agent any
 
+    triggers {
+        pollSCM('* * * * *')
+    }
+
     stages {
         stage('Checkout') {
             steps {
-                echo 'Checkout stage'
+                checkout scm
             }
         }
 
-        stage('Build') {
+        stage('Compile') {
             steps {
-                echo 'Build stage'
+                bat 'javac Hello.java'
             }
         }
 
         stage('Test') {
             steps {
-                echo 'Test stage'
+                bat 'java Hello'
+            }
+        }
+
+        stage('Archive') {
+            steps {
+                archiveArtifacts artifacts: '*.class', fingerprint: true
             }
         }
     }
 
     post {
         success {
-            echo 'BUILD SUCCESS: All stages completed successfully'
+            echo 'CI PIPELINE SUCCESSFUL'
         }
         failure {
-            echo 'BUILD FAILED: Please check logs for errors'
+            echo 'CI PIPELINE FAILED'
         }
         always {
-            echo 'POST ACTION: Pipeline execution finished'
+            echo 'CI PIPELINE FINISHED'
         }
     }
 }
